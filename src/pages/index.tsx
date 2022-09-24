@@ -1,33 +1,45 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
-const catImages: string[] = [
-  "https://cdn2.thecatapi.com/images/bpc.jpg",
-  "https://cdn2.thecatapi.com/images/eac.jpg",
-  "https://cdn2.thecatapi.com/images/6qi.jpg",
-];
+interface CatCategory {
+  id: number;
+  name: string;
+}
 
-const randomCatImage = (): string => {
-  const index = Math.floor(Math.random() * catImages.length);
-  return catImages[index];
-};
+interface SearchCatImage {
+  breeds: string[];
+  categories: CatCategory[];
+  id: string;
+  url: string;
+  width: number;
+  height: number;
+}
+
+type SearchCatImageResponce = SearchCatImage[];
+
+const fetchCatImage = async (): Promise<SearchCatImage> => {
+  const res = await fetch("https://api.thecatapi.com/v1/images/search");
+  const result = (await res.json()) as SearchCatImageResponce;
+  return result[0];
+}
 
 const IndexPage = () => {
-  const [catImageUrl, setCatImageUrl] = useState("https://cdn2.thecatapi.com/images/bpc.jpg")
-  
-  const handleClick = () => {
-    setCatImageUrl(randomCatImage());
+  const [catImage, setCatImage] = useState(
+    "https://cdn2.thecatapi.com/images/bpc.jpg"
+  );
+
+  const handleClick = async () => {
+    const image = await fetchCatImage();
+    setCatImage(image.url);
   };
   
   return (
     <div>
       <button onClick={ handleClick }>きょうのにゃんこ🐱</button>
       <div style={{ marginTop: 8 }}>
-        <img src={catImageUrl} />
+        <img src={catImage} />
       </div>
     </div>
   );
 };
 
-
- 
 export default IndexPage;
